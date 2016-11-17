@@ -8,10 +8,8 @@
 #include <iostream>
 using namespace std;
 
-enum Type{NORMAL, KING};
-
-
-enum Color{DARK, LIGHT};
+enum Type: bool {NORMAL, KING};
+enum Color: bool {DARK, LIGHT};
 inline ostream& operator<<(ostream &strm, const Color &c) {
     switch(c){
         case DARK: return strm<<"Red";

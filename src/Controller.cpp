@@ -17,61 +17,61 @@ Controller::Controller(){
 
 void Controller::start(){
     do {
-     ui.mainMenu();
+        srand(time(NULL));
+        ui.mainMenu();
 
-    GameMode gm = getGameMode();
-    if (gm==TWOPLAYER) {
-        board = new GameBoard();
-        dark = new HumanPlayer(DARK);
-        light = new HumanPlayer(LIGHT);
-    }
+        GameMode gm = getGameMode();
+        if (gm==TWOPLAYER) {
+            board = new GameBoard();
+            dark = new HumanPlayer(DARK);
+            light = new HumanPlayer(LIGHT);
+        }
 
-/*    if (gm==PLAYERCOMPUTER){
+    if (gm==PLAYERCOMPUTER){
         if (rand()%2==0){
             board=new GameBoard();
-            dark=new ComputerPlayer(DARK);
+            dark=new ComputerPlayer(board, DARK);
             light=new HumanPlayer(LIGHT);
-            computerDark=true;
         }
         else{
             board=new GameBoard();
             dark=new HumanPlayer(DARK);
-            light=new ComputerPlayer(LIGHT);
+            light=new ComputerPlayer(board, LIGHT);
        }
-     }*/
+     }
         current=dark;
         ui.initUI(board, current);
 
 
-     while (!checkLose()){
-         bool legalmove =false;
-         while (!legalmove){
-             if ((gm==TWOPLAYER && current==light)
-                 || (gm==PLAYERCOMPUTER && !dark->isHuman())){
-                 ui.updateBoard(true, true);
-                 getValidInput(true);
-             }
-             else{
-                 ui.updateBoard(true);
-                 getValidInput(false);
-             }
-             Move move = current->getMove();
-             if (!isLegalMove(move)){
-                 showError(ILLEGAL, 500);
-             }
-             else {
-                 legalmove=true;
-                 executeMove(move);
-             }
-         }
-         current==dark ? current=light:current=dark;
-         ui.updatePlayer(current);
-     }
-     ui.endGame();
+        while (!checkLose()){
+            bool legalmove =false;
+            while (!legalmove){
+                if (current->isHuman()) {
+                    if (current == light) {
+                        ui.updateBoard(true, true);
+                        getValidInput(true);
+                    } else {
+                        ui.updateBoard(true);
+                        getValidInput(false);
+                    }
+                }
+                Move move = current->getMove();
+                if (!isLegalMove(move)){
+                    showError(ILLEGAL, 500);
+                }
+                else {
+                    legalmove=true;
+                    executeMove(move);
+                }
+            }
+            current==dark ? current=light:current=dark;
+            ui.updatePlayer(current);
+        }
+        ui.endGame();
 
-     delete board; delete dark; delete light;
+        delete board; delete dark; delete light;
 
-     } while (playAgain());
+    } while (playAgain());
 }
 
 GameMode Controller::getGameMode() {
@@ -117,19 +117,16 @@ bool Controller::isLegalMove(Move m) {
     Color color = piece->getColor();
     if (color == current->getColor()) {
         if (m.getLength()==2) {
-            if (board->isLegalSlide(start, finish) && !board->jumpsAvailable(current->getColor())){
+            if (board->isLegalSlide(piece, start, finish) && !board->jumpsAvailable(current->getColor())){
                 return true;
             }
-            if (board->isLegalJump(start,finish)){
-                return true;
-            }
-            return false;
+            return board->isLegalJump(piece, start, finish);
         }
         else{
             while (m.hasNext()){
                 start=finish;
                 finish=m.getNext();
-                if (!board->isLegalJump(start,finish)){
+                if (!board->isLegalJump(piece, start,finish)){
                     return false;
                 }
             }
@@ -159,10 +156,11 @@ bool Controller::checkLose() {
 }
 
 void Controller::executeMove(Move m) {
+    Piece * piece= board->getPiece(m.getFirst());
     array<int,2> start=m.getFirst(), finish=m.getNext();
     if (m.getLength()==2){
-        if (board->isLegalSlide(start,finish)) board->movePiece(start,finish);
-        else if (board->isLegalJump(start,finish)) {
+        if (board->isLegalSlide(piece, start,finish)) board->movePiece(start,finish);
+        else if (board->isLegalJump(piece, start,finish)) {
             board->removePiece({(finish[0]+start[0])/2,(finish[1]+start[1])/2});
             board->movePiece(start,finish);
         }
@@ -190,6 +188,13 @@ void Controller::getValidInput(bool flipped) {
         if (static_cast<HumanPlayer*>(current)->getInput()=="q") exit(0);
     }
 }
+
+
+
+
+
+
+
 
 
 

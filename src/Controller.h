@@ -7,8 +7,10 @@
 
 #include "Move.h"
 #include "HumanPlayer.h"
+#include "ComputerPlayer.h"
 #include "GameUI.h"
 #include <cstdlib>
+#include <time.h>
 using namespace std;
 
 enum GameMode{TWOPLAYER, PLAYERCOMPUTER};

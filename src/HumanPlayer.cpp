@@ -36,7 +36,7 @@ bool HumanPlayer::hasValidInput(){
 
 Move HumanPlayer::getMove() {
     vector<array<int,2>> sequence;
-    if (!hasValidInput()) return Move({});
+    if (!hasValidInput()) return Move();
     else{
         vector<string> split_input = split(input,' ');
         for (auto const& item : split_input){

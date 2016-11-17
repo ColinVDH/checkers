@@ -4,7 +4,10 @@
 
 #include "Move.h"
 
-Move::Move(vector<array<int,2>> seq): sequence(seq){
+
+
+Move::Move(){
+    sequence={};
 }
 
 array<int,2> Move::getNext() {
@@ -24,6 +27,16 @@ array<int,2> Move::getFirst() {
 int Move::getLength() {
     return sequence.size();
 }
+
+vector<array<int,2>> Move::getSequence(){
+    return sequence;
+}
+
+Move::Move(vector<array<int, 2>> s) {
+    sequence=s;
+};
+
+
 
 
 

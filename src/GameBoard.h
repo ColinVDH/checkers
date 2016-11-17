@@ -21,16 +21,17 @@ private:
 
 public:
     GameBoard();
+    GameBoard(array<array<Piece*,8>, 8> b, int darkP, int lightP);
     ~GameBoard();
-/*    void setPiece(int x, int y, Piece *p);
-    void setPiece(array<int,2> a, Piece *p);*/
+    GameBoard* Clone();
+    void setPiece(int x, int y, Piece *p);
+    void setPiece(array<int,2> a, Piece *p);
     Piece * getPiece(int x, int y);
     Piece * getPiece(array<int,2> a);
     bool isEmpty(array<int,2> a);
 
-
-    bool isLegalJump(array<int,2> start, array<int,2> finish);
-    bool isLegalSlide(array<int,2> start, array<int,2> finish);
+    bool isLegalJump(Piece * p, array<int,2> start, array<int,2> finish);
+    bool isLegalSlide(Piece * p, array<int,2> start, array<int,2> finish);
     bool jumpsAvailable(Color c);
 
     bool piecesRemaining(Color c);
@@ -40,7 +41,8 @@ public:
     void movePiece(array<int,2> start, array<int,2> finish);
 
     bool withinBounds(array<int, 2> array);
-};
 
+
+};
 
 #endif //CHECKERS_BOARD_H
