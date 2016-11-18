@@ -26,3 +26,4 @@ void Piece::setType(Type t) {
     type=t;
 }
 
+

@@ -8,14 +8,14 @@
 GameBoard::GameBoard() {
     darkPieces =12;
     lightPieces = 12;
-    for (int i = 0; i<8; i++) {
-        for (int j = 0; j<8; j++) {
-            if (i < 3) {
-                if ((i + j) % 2 == 0) board[i][j] = new Piece(DARK);
-                else board[i][j]=nullptr;
-            } else if (i > 4) {
-                if ((i + j) % 2 == 0) board[i][j] = new Piece(LIGHT);
-                else board[i][j]=nullptr;
+    for (int y = 0; y<8; y++) {
+        for (int x = 0; x<8; x++) {
+            if (y < 3) {
+                if ((y + x) % 2 == 0) board[y][x] = new Piece(DARK);
+                else board[y][x]=nullptr;
+            } else if (y > 4) {
+                if ((y + x) % 2 == 0) board[y][x] = new Piece(LIGHT);
+                else board[y][x]=nullptr;
             }
         }
     }
@@ -25,14 +25,15 @@ Piece * GameBoard::getPiece(int x, int y) {
     return board[y][x];
 }
 
-/*void GameBoard::setPiece(int x, int y, Piece *p) {
-    if (*board[y][x]!=nullptr) delete board[y][x];
+void GameBoard::setPiece(int x, int y, Piece *p) {
+    if (board[y][x]!=nullptr) delete board[y][x];
     board[y][x]=p;
 }
+
 void GameBoard::setPiece(array<int, 2> a, Piece *p) {
-    if (*board[a[0]][a[1]]!=nullptr) delete board[a[0]][a[1]];
+    if (board[a[0]][a[1]]!=nullptr) delete board[a[0]][a[1]];
     board[a[0]][a[1]]=p;
-}*/
+}
 
 
 Piece * GameBoard::getPiece(array<int, 2> a) {
@@ -41,13 +42,9 @@ Piece * GameBoard::getPiece(array<int, 2> a) {
 
 
 
-bool GameBoard::isLegalJump(array<int, 2> start, array<int, 2> finish) {
-    Piece * piece = getPiece(start);
-    if (piece==nullptr) {
-        return false;
-    }
-    Type type=piece->getType();
-    Color color=piece->getColor();
+bool GameBoard::isLegalJump(Piece *p, array<int, 2> start, array<int, 2> finish) {
+    Type type=p->getType();
+    Color color=p->getColor();
 
     if (getPiece(finish)!=nullptr){
         return false;
@@ -55,6 +52,7 @@ bool GameBoard::isLegalJump(array<int, 2> start, array<int, 2> finish) {
     else if (!withinBounds(finish)){
         return false;
     }
+
     else{
         if (type==KING || (color == LIGHT)) {
             if (finish[1]-start[1]==-2 && abs(finish[0]-start[0])==2){
@@ -65,7 +63,7 @@ bool GameBoard::isLegalJump(array<int, 2> start, array<int, 2> finish) {
                 }
             }
         }
-        else if  (type==KING || (color == DARK)) {
+        if  (type==KING || (color == DARK)) {
             if (finish[1]-start[1]==2 && abs(finish[0]-start[0])==2){
                 array<int,2> mid= {(finish[0]+start[0])/2,(finish[1]+start[1])/2};
                 Piece * jumped = getPiece(mid);
@@ -78,14 +76,9 @@ bool GameBoard::isLegalJump(array<int, 2> start, array<int, 2> finish) {
     }
 }
 
-bool GameBoard::isLegalSlide(array<int, 2> start, array<int, 2> finish) {
-    Piece * piece = getPiece(start);
-    if (piece==nullptr) {
-        return false;
-    }
-
-    Type type=piece->getType();
-    Color color=piece->getColor();
+bool GameBoard::isLegalSlide(Piece * p, array<int, 2> start, array<int, 2> finish) {
+    Type type=p->getType();
+    Color color=p->getColor();
 
     if (getPiece(finish)!=nullptr){
         return false;
@@ -100,7 +93,7 @@ bool GameBoard::isLegalSlide(array<int, 2> start, array<int, 2> finish) {
                 return true;
             }
         }
-        else if  (type==KING || (color == DARK)) {
+        if  (type==KING || (color == DARK)) {
             if (finish[1]-start[1]==1 && abs(finish[0]-start[0])==1){
                 return true;
             }
@@ -115,13 +108,13 @@ bool GameBoard::jumpsAvailable(Color c) {
             Piece* piece=board[y][x];
             if (piece!=nullptr && piece->getColor()==c){
                 if (piece->getType()==KING || (c == LIGHT)) {
-                    if (isLegalJump({x, y}, {x + 2, y - 2})
-                        || isLegalJump({x, y}, {x - 2, y - 2}))
+                    if (isLegalJump(piece, {x, y}, {x + 2, y - 2})
+                        || isLegalJump(piece, {x, y}, {x - 2, y - 2}))
                         return true;
                 }
-                else if (piece->getType()==KING || (c == DARK)) {
-                    if (isLegalJump({x, y}, {x + 2, y + 2})
-                        || isLegalJump({x, y}, {x - 2, y + 2}))
+                if (piece->getType()==KING || (c == DARK)) {
+                    if (isLegalJump(piece, {x, y}, {x + 2, y + 2})
+                        || isLegalJump(piece, {x, y}, {x - 2, y + 2}))
                         return true;
                 }
             }
@@ -140,20 +133,20 @@ bool GameBoard::movesRemaining(Color c) {
         for (int x=0; x<8; x++){
             Piece* piece=board[y][x];
             if (piece!=nullptr && piece->getColor()==c){
-                 if (piece->getType()==KING || (c == LIGHT)) {
-                     if (isLegalJump({x, y}, {x + 2, y - 2})
-                         || isLegalJump({x, y}, {x - 2, y - 2})
-                         || isLegalSlide({x, y}, {x + 1, y - 1})
-                         || isLegalSlide({x, y}, {x - 1, y - 1}))
-                         return true;
-                 }
-                 else if (piece->getType()==KING || (c == DARK)) {
-                     if (isLegalJump({x, y}, {x + 2, y + 2})
-                         || isLegalJump({x, y}, {x - 2, y + 2})
-                         || isLegalSlide({x, y}, {x + 1, y + 1})
-                         || isLegalSlide({x, y}, {x - 1, y + 1}))
-                         return true;
-                 }
+                if (piece->getType()==KING || (c == LIGHT)) {
+                    if (isLegalJump(piece, {x, y}, {x + 2, y - 2})
+                        || isLegalJump(piece, {x, y}, {x - 2, y - 2})
+                        || isLegalSlide(piece, {x, y}, {x + 1, y - 1})
+                        || isLegalSlide(piece, {x, y}, {x - 1, y - 1}))
+                        return true;
+                }
+                if (piece->getType()==KING || (c == DARK)) {
+                    if (isLegalJump(piece, {x, y}, {x + 2, y + 2})
+                        || isLegalJump(piece, {x, y}, {x - 2, y + 2})
+                        || isLegalSlide(piece, {x, y}, {x + 1, y + 1})
+                        || isLegalSlide(piece, {x, y}, {x - 1, y + 1}))
+                        return true;
+                }
             }
         }
     }
@@ -168,11 +161,17 @@ void GameBoard::removePiece(array<int, 2> a) {
 }
 
 GameBoard::~GameBoard() {
-    for(auto const& row: board) {
-        for (auto const& item: row){
-            delete item;
+    array<array<Piece*,8>,8>::const_iterator row;
+    array<Piece*,8>::const_iterator col;
+
+    for (row = board.begin(); row != board.end(); ++row)
+    {
+        for (col = row->begin(); col != row->end(); ++col)
+        {
+            delete (*col);
         }
     }
+
 }
 
 void GameBoard::movePiece(array<int, 2> start, array<int, 2> finish) {
@@ -189,6 +188,51 @@ bool GameBoard::isEmpty(array<int,2> a) {
 
 bool GameBoard::withinBounds(array<int, 2> a) {
     return (a[0]>=0 && a[0]<=7 && a[1]>=0 && a[1]<=7);
+}
+
+
+
+GameBoard::GameBoard(array<array<Piece *, 8>, 8> b, int darkP, int lightP) {
+    board=b;
+    lightPieces=lightP;
+    darkPieces=darkP;
+}
+
+GameBoard::GameBoard(const GameBoard &obj) {
+    board=array<array<Piece*,8>,8>();
+    darkPieces = obj.darkPieces;
+    lightPieces = obj.lightPieces;
+    for (int y = 0; y<8; y++) {
+        for (int x = 0; x<8; x++) {
+            if (obj.board[y][x]==nullptr)
+                board[y][x]=nullptr;
+            else
+                board[y][x]=new Piece(*obj.board[y][x]);
+
+        }
+    }
+}
+
+GameBoard& GameBoard::operator=(GameBoard tmp){
+    swap(darkPieces, tmp.darkPieces);
+    swap(lightPieces, tmp.lightPieces);
+    swap(board, tmp.board);
+    return *this;
+}
+
+GameBoard::GameBoard(GameBoard *obj) {
+    board=array<array<Piece*,8>,8>();
+    darkPieces = obj->darkPieces;
+    lightPieces = obj->lightPieces;
+    for (int y = 0; y<8; y++) {
+        for (int x = 0; x<8; x++) {
+            if (obj->board[y][x]==nullptr)
+                board[y][x]=nullptr;
+            else
+                board[y][x]=new Piece(*obj->board[y][x]);
+
+        }
+    }
 }
 
 

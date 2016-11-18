@@ -14,7 +14,7 @@
 
 class ComputerPlayer: public Player{
 public:
-    ComputerPlayer(GameBoard * board, Color color);
+    ComputerPlayer(GameBoard *board, Color color);
     Move getMove();
     bool isHuman();
     static bool compareVisits (TreeNode * i,TreeNode * j);

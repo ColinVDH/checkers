@@ -23,7 +23,11 @@ public:
     GameBoard();
     GameBoard(array<array<Piece*,8>, 8> b, int darkP, int lightP);
     ~GameBoard();
-    GameBoard* Clone();
+    GameBoard(const GameBoard &obj);
+    GameBoard(GameBoard *obj);
+    GameBoard& operator=(GameBoard tmp);
+
+
     void setPiece(int x, int y, Piece *p);
     void setPiece(array<int,2> a, Piece *p);
     Piece * getPiece(int x, int y);
@@ -43,6 +47,8 @@ public:
     bool withinBounds(array<int, 2> array);
 
 
+
 };
+
 
 #endif //CHECKERS_BOARD_H

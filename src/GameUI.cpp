@@ -15,11 +15,13 @@ void GameUI::showFooter() {
 }
 
 void GameUI::showBoardFlipped(){
-    // "\033" is ESC while the "[##m" part are ANSI codes and "\u25CF" is a circle
+    // "\033" is ESC while the "[##m" part are ANSI codes and "\u25CF" is a circle and \u265a is a unicode king symbol
     string DE = "\033[40m   \033[49m"; // Empty dark tile
     string LE = "\033[47m   \033[49m"; // Empty light tile
     string WP = "\033[1;34;40m \u25CF \033[0;49m"; // White Piece
     string RP = "\033[1;31;40m \u25CF \033[0;39;49m"; // Red Piece
+    string WK = "\033[1;34;40m \u265A \033[0;49m"; // White King
+    string RK = "\033[1;31;40m \u265A \033[0;39;49m"; // Red King
 
     string result = "";
 
@@ -27,10 +29,11 @@ void GameUI::showBoardFlipped(){
     for (int i=0; i<8; i++){
         result+=to_string(i+1);
         for (int j=7; j>=0; j--){
-            if (board->getPiece(j,i)==nullptr){
+            if (board->getPiece(j,i)==nullptr)
                 result+= ((i+j)%2==0) ? DE: LE;
-            }
-            else result+= (board->getPiece(j,i)->getColor()==DARK) ? RP : WP;
+            else if (board->getPiece(j,i)->getColor()==DARK)
+                result+= (board->getPiece(j,i)->getType()==NORMAL) ? RP: RK;
+            else result+= (board->getPiece(j,i)->getType()==NORMAL) ? WP: WK;
         }
         result+=to_string(i+1)+"\n";
     }
@@ -42,11 +45,13 @@ void GameUI::showBoardFlipped(){
 
 void GameUI::showBoard() {
 
-    // "\033" is ESC while the "[##m" part are ANSI codes and "\u25CF" is a circle
+    // "\033" is ESC while the "[##m" part are ANSI codes and "\u25CF" is a unicode circle. \u265a is a unicode king symbol
     string DE = "\033[40m   \033[49m"; // Empty dark tile
     string LE = "\033[47m   \033[49m"; // Empty light tile
     string WP = "\033[1;34;40m \u25CF \033[0;49m"; // White Piece
     string RP = "\033[1;31;40m \u25CF \033[0;39;49m"; // Red Piece
+    string WK = "\033[1;34;40m \u265A \033[0;49m"; // White King
+    string RK = "\033[1;31;40m \u265A \033[0;39;49m"; // Red King
 
     string result = "";
 
@@ -54,10 +59,11 @@ void GameUI::showBoard() {
     for (int i=7; i>=0; i--){
         result+=to_string(i+1);
         for (int j=0; j<8; j++){
-            if (board->getPiece(j,i)==nullptr){
+            if (board->getPiece(j,i)==nullptr)
                 result+= ((i+j)%2==0) ? DE: LE;
-            }
-            else result+= (board->getPiece(j,i)->getColor()==DARK) ? RP : WP;
+            else if (board->getPiece(j,i)->getColor()==DARK)
+                result+= (board->getPiece(j,i)->getType()==NORMAL) ? RP: RK;
+            else result+= (board->getPiece(j,i)->getType()==NORMAL) ? WP: WK;
         }
         result+=to_string(i+1)+"\n";
     }

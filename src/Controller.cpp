@@ -165,15 +165,17 @@ void Controller::executeMove(Move m) {
             board->movePiece(start,finish);
         }
     }
-
-    while (m.hasNext()){
-        start=finish;
-        finish=m.getNext();
+    else{
         board->removePiece({(finish[0]+start[0])/2,(finish[1]+start[1])/2});
         board->movePiece(start,finish);
-        //ui.updateBoard(false);
+        while (m.hasNext()){
+            start=finish;
+            finish=m.getNext();
+            board->removePiece({(finish[0]+start[0])/2,(finish[1]+start[1])/2});
+            board->movePiece(start,finish);
+            //ui.updateBoard(false);
+        }
     }
-
 }
 
 void Controller::getValidInput(bool flipped) {
