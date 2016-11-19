@@ -45,7 +45,7 @@ Move HumanPlayer::getMove() {
             sequence.push_back({x,y});
         }
     }
-    return sequence;
+    return Move(sequence);
 }
 
 vector<string> HumanPlayer::split(string s, char delim) {

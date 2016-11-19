@@ -15,7 +15,7 @@ private:
     Player * current;
 
     void showFooter();
-    void showBoard();
+    void showBoard(bool flipped);
     void showHeader();
 
 public:
@@ -29,8 +29,6 @@ public:
     void endGame();
 
     void updatePlayer(Player *pPlayer);
-
-    void showBoardFlipped();
 
     void updateBoard(bool footer, bool flipped);
 };

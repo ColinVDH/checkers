@@ -55,9 +55,14 @@ void Controller::start(){
                         getValidInput(false);
                     }
                 }
+                else{
+                    ui.updateBoard(true);
+                    pause(2000);
+
+                }
                 Move move = current->getMove();
                 if (!isLegalMove(move)){
-                    showError(ILLEGAL, 500);
+                    showError(ILLEGAL, 1000);
                 }
                 else {
                     legalmove=true;
@@ -80,7 +85,7 @@ GameMode Controller::getGameMode() {
     else if (i=="1") return TWOPLAYER;
     else if (i=="2") return PLAYERCOMPUTER;
     else{
-        showError(INVALID,500);
+        showError(INVALID,1000);
         ui.mainMenu();
         return getGameMode();
     }
@@ -145,7 +150,7 @@ bool Controller::playAgain() {
             return true;
         } else if (i == "n") {
             return false;
-        } else showError(INVALID, 1);
+        } else showError(INVALID, 1000);
         //ui.gameOver();
     }
 }
@@ -173,7 +178,9 @@ void Controller::executeMove(Move m) {
             finish=m.getNext();
             board->removePiece({(finish[0]+start[0])/2,(finish[1]+start[1])/2});
             board->movePiece(start,finish);
-            //ui.updateBoard(false);
+            if ((current == light) && current->isHuman()) ui.updateBoard(false, true);
+            else ui.updateBoard(false);
+            pause(3000);
         }
     }
 }
@@ -182,7 +189,7 @@ void Controller::getValidInput(bool flipped) {
     if (current->isHuman()){
         static_cast<HumanPlayer*>(current)->setInput();
         while (!static_cast<HumanPlayer*>(current)->hasValidInput()){
-            showError(INVALID, 500);
+            showError(INVALID, 1000);
             if (flipped) ui.updateBoard(true, true);
             else ui.updateBoard(true);
             static_cast<HumanPlayer*>(current)->setInput();

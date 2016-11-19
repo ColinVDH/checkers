@@ -176,8 +176,8 @@ GameBoard::~GameBoard() {
 
 void GameBoard::movePiece(array<int, 2> start, array<int, 2> finish) {
     board[finish[1]][finish[0]]=board[start[1]][start[0]];
-    if ((finish[0]==0 && getPiece(start)->getColor()==LIGHT)
-        || (finish[0]==7 && getPiece(start)->getColor()==DARK))
+    if ((finish[1]==0 && getPiece(start)->getColor()==LIGHT)
+        || (finish[1]==7 && getPiece(start)->getColor()==DARK))
         getPiece(start)->setType(KING);
     board[start[1]][start[0]]=nullptr;
 }
