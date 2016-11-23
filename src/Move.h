@@ -24,8 +24,8 @@ public:
     vector<array<int, 2>> getSequence();
 
 private:
-    vector<array<int,2>> sequence;
-    int cursor=0;
+    vector<array<int,2>> sequence; //stores the sequence of move positions
+    int cursor; //stores the index of the current move position
 };
 
 

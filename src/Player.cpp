@@ -4,26 +4,15 @@
 
 #include "Player.h"
 
+//constructor
 Player::Player(Color color) {
-    p=color;
+    p=color; //sets color of the player
 }
 
+//returns color of the player
 Color Player::getColor(){
     return p;
 }
 
 
-/*
-int Player::getNumPieces() {
-    return numPieces;
-}
-
-void Player::removePiece() {
-    numPieces--;
-}
-
-bool Player::hasLost() {
-    return numPieces==0;
-}
-*/
 

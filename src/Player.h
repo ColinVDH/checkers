@@ -8,15 +8,15 @@
 
 #include "Move.h"
 #include "GameBoard.h"
-
+//Player is an abstract class (cannot be instantiated) that is the parent for HumanPlayer and ComputerPlayer
 class Player {
-private:
-    Color p;
 public:
     Player(Color color);
-    virtual Move getMove()=0;
-    virtual bool isHuman()=0;
+    virtual Move getMove()=0; //virtual function to get the move from the player.
+    virtual bool isHuman()=0; //virtual function to check if a player is human or not.
     Color getColor();
+private:
+    Color p; //color of the player
 };
 
 

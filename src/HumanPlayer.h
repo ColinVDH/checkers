@@ -17,7 +17,7 @@ public:
     string getInput();
     bool isHuman();
 private:
-    string input;
+    string input; //stores the current input given by the user
     vector<string> split(string s, char delim);
 
 };

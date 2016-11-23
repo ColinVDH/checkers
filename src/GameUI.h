@@ -9,14 +9,10 @@
 #include "GameUI.h"
 #include "Player.h"
 
-class GameUI {
-private:
-    GameBoard * board;
-    Player * current;
+enum GameMode{TWOPLAYER, PLAYERCOMPUTER}; //enum to signify the GameMode type.
+enum Error{INVALID, ILLEGAL}; //enum to signify the Error type.
 
-    void showFooter();
-    void showBoard(bool flipped);
-    void showHeader();
+class GameUI {
 
 public:
     GameUI();
@@ -26,11 +22,20 @@ public:
     void InvalidInputMessage();
     void IllegalMoveMessage();
     void updateBoard(bool footer);
-    void endGame();
+    void endGame(GameMode gm, Player * loser);
 
     void updatePlayer(Player *pPlayer);
 
     void updateBoard(bool footer, bool flipped);
+
+private:
+    GameBoard * board; //pointer to game board
+    Player * current; //pointer to current player
+
+    void showFooter();
+    void showBoard(bool flipped);
+    void showHeader();
+
 };
 
 
