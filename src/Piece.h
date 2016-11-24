@@ -19,6 +19,8 @@ inline ostream& operator<<(ostream &strm, const Color &c) {
     }
 }
 
+
+
 class Piece {
 public:
     Piece(Color c);

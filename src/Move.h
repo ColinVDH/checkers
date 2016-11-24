@@ -22,7 +22,8 @@ public:
     array<int,2> getNext();
     int getLength();
     vector<array<int, 2>> getSequence();
-
+    bool operator==(const Move &other) const;
+    bool operator!=(const Move &other) const;
 private:
     vector<array<int,2>> sequence; //stores the sequence of move positions
     int cursor; //stores the index of the current move position

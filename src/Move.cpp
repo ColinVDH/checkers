@@ -40,6 +40,14 @@ vector<array<int,2>> Move::getSequence(){
     return sequence;
 }
 
+bool Move::operator==(const Move &other) const {
+    return (sequence==other.sequence);
+}
+
+bool Move::operator!=(const Move &other) const {
+    return !(sequence==other.sequence);
+}
+
 
 
 

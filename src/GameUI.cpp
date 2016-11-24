@@ -9,9 +9,7 @@ GameUI::GameUI() {
 
 //shows the footer on the game screen
 void GameUI::showFooter() {
-    if (!current->isHuman()) cout<<"Thinking...";
-    else cout<<"Enter move:";
-
+    if (current->isHuman()) cout<<"Enter move:";
 }
 
 //shows the board. If flipped, the board will be rotated 180 degrees and displayed.
@@ -103,7 +101,8 @@ void GameUI::mainMenu() {
             "                                                                \n"
             ""<<endl;
     cout<<"1. Player vs. Player"<<endl;
-    cout<<"2. Player vs. Computer"<<endl<<endl;
+    cout<<"2. Player vs. Computer"<<endl;
+    cout<<"3. Computer vs. Computer"<<endl<<endl;
     cout<<"Select:";
 }
 
@@ -116,7 +115,7 @@ void GameUI::IllegalMoveMessage() {
     cout<<"ERROR: Illegal Move!"<<endl;
 }
 //print game over screen
-void GameUI::endGame(GameMode gm, Player * loser) {
+void GameUI::endGame(GameMode gm, Player * winner) {
     clearScreen();
     cout<<"\n"
             "\n"
@@ -128,9 +127,9 @@ void GameUI::endGame(GameMode gm, Player * loser) {
             " ╚═════╝ ╚═╝  ╚═╝╚═╝     ╚═╝╚══════╝     ╚═════╝   ╚═══╝  ╚══════╝╚═╝  ╚═╝╚═╝\n"
             "                                                                             \n"
             ""<<endl;
-    if (gm==PLAYERCOMPUTER && loser->isHuman()) cout<<"Computer wins!"<<endl;
-    else if (gm==PLAYERCOMPUTER && !loser->isHuman()) cout<<"You win!"<<endl;
-    else cout<<!loser->getColor()<<" wins!"<<endl;
+    if (gm==PLAYERCOMPUTER && !winner->isHuman()) cout<<"Computer wins!"<<endl;
+    else if (gm==PLAYERCOMPUTER && winner->isHuman()) cout<<"You win!"<<endl;
+    else cout<<winner->getColor()<<" wins!"<<endl;
     cout<<"Play again? (y/n) ";
 }
 

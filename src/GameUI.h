@@ -9,7 +9,7 @@
 #include "GameUI.h"
 #include "Player.h"
 
-enum GameMode{TWOPLAYER, PLAYERCOMPUTER}; //enum to signify the GameMode type.
+enum GameMode{TWOPLAYER, PLAYERCOMPUTER, TWOCOMPUTER}; //enum to signify the GameMode type.
 enum Error{INVALID, ILLEGAL}; //enum to signify the Error type.
 
 class GameUI {

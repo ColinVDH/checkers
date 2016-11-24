@@ -7,6 +7,7 @@
 #include "GameUI.h"
 #include <cstdlib>
 #include <time.h>
+#include <algorithm>
 using namespace std;
 
 class Controller {
@@ -30,10 +31,6 @@ private:
     void showError(Error e, int time);
     bool playAgain();
     void getValidInput(bool flipped);
-
-
-
-
 };
 
 

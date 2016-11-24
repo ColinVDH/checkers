@@ -22,18 +22,31 @@ void Controller::start(){
             light = new HumanPlayer(LIGHT);
         }
 
-    if (gm==PLAYERCOMPUTER){ //player vs. computer game
-        if (rand()%2==0){ //randomly decide who will play as dark (go first).
-            board=new GameBoard();
-            dark=new ComputerPlayer(board, DARK);
-            light=new HumanPlayer(LIGHT);
+        if (gm==PLAYERCOMPUTER){ //player vs. computer game
+            if (rand()%2==0){ //randomly decide who will play as dark (go first).
+                board=new GameBoard();
+                dark=new ComputerPlayer(board, DARK);
+                light=new HumanPlayer(LIGHT);
+            }
+            else{
+                board=new GameBoard();
+                dark=new HumanPlayer(DARK);
+                light=new ComputerPlayer(board, LIGHT);
+           }
+         }
+
+        if (gm==TWOCOMPUTER){
+            if (rand()%2==0){ //randomly decide who will play as dark (go first).
+                board=new GameBoard();
+                dark=new ComputerPlayer(board, DARK);
+                light=new ComputerPlayer(board, LIGHT);
+            }
+            else{
+                board=new GameBoard();
+                dark=new ComputerPlayer(board, DARK);
+                light=new ComputerPlayer(board, LIGHT);
+            }
         }
-        else{
-            board=new GameBoard();
-            dark=new HumanPlayer(DARK);
-            light=new ComputerPlayer(board, LIGHT);
-       }
-     }
         current=dark; //dark always starts
         ui.initUI(board, current); //provides UI with the board and the current player.
 
@@ -41,7 +54,7 @@ void Controller::start(){
         while (!checkLose()){ //game Loop runs until somebody loses.
             bool legalmove =false;
             while (!legalmove){ //loops until a legal move is provided
-                if (current->isHuman()) {
+                if (gm==TWOPLAYER || (gm==PLAYERCOMPUTER && current->isHuman())) {
                     if (current == light) {
                         ui.updateBoard(true, true); //updates the board in a flipped position so that light is on bottom, show footer.
                         getValidInput(true); //get a valid move from the user.
@@ -50,12 +63,16 @@ void Controller::start(){
                         getValidInput(false); //get a valid move from the user
                     }
                 }
-                else{ //computer player --- always update the board such that the computer is on top.
+                else if (gm==PLAYERCOMPUTER && !current->isHuman()){ //computer player --- always update the board such that the computer is on top.
                     if (current== dark) ui.updateBoard(true, true);  //update the board in flipped position
                     else ui.updateBoard(true); //update board in normal position
-                    pause(2000);
-
+                    pause(1000);
                 }
+                else if (gm==TWOCOMPUTER) {
+                    ui.updateBoard(true);
+                    pause(1000);
+                }
+
                 Move move = current->getMove(); //get move from current player (computer or human).
                 if (!isLegalMove(move)){ //check if legal
                     showError(ILLEGAL, 1000); //show illegal message for 1 second
@@ -68,9 +85,11 @@ void Controller::start(){
             current==dark ? current=light:current=dark; //switch the current player
             ui.updatePlayer(current); //update the board to fit perspective of current player.
         } //end of game loop
-        ui.endGame(gm, current);  //display game over screen
+        current==dark ? ui.endGame(gm, light) : ui.endGame(gm, dark);  //display game over screen
 
-        delete board; delete dark; delete light; //delete the board and both player objects.
+        delete this->board;
+        delete this->dark;
+        delete this->light; //delete the board and both player objects.
 
     } while (playAgain()); //check if the user wants to play again. If so, repeat.
 }
@@ -81,6 +100,7 @@ GameMode Controller::getGameMode() {
     if (i=="q") exit(0);
     else if (i=="1") return TWOPLAYER;
     else if (i=="2") return PLAYERCOMPUTER;
+    else if (i=="3") return TWOCOMPUTER;
     else{
         showError(INVALID,1000); //show invalid error message for 1 second
         ui.mainMenu();//redisplay main menu
@@ -113,37 +133,12 @@ void Controller::pause(int time) {
 }
 
 //checks if the input move is legal
-bool Controller::isLegalMove(Move m) {
-    array<int, 2> start = m.getFirst(), finish = m.getNext(); //parse move into an array.
-    if (board->getPiece(start)==nullptr){ //checks if the piece at the beginning is a null pointer
-        return false;
+bool Controller::isLegalMove(Move chosen) {
+    vector<Move> allmoves=board->getMoves(current->getColor());
+    for (Move m: allmoves){
+        if (chosen == m) return true;
     }
-    Piece * piece =  board->getPiece(start);
-    Color color = piece->getColor();
-    if (color == current->getColor()) { //checks if the color of the specified piece matches.
-        if (m.getLength()==2) { //checks if the move length is 2
-            if (board->isLegalSlide(piece, start, finish) && !board->jumpsAvailable(current->getColor())){ //checks if jumps are not available and is a legal "slide"
-                return true;
-            }
-            return board->isLegalJump(piece, start, finish); //otherwise checks if legal jump
-        }
-        else{ //multijump move.
-            while (m.hasNext()){ //keep iterating through move until it is complete
-                start=finish; //previous finish becomes the start.
-                finish=m.getNext(); //finish is the next element of the move.
-                if (!board->isLegalJump(piece, start,finish)){ //checks if the current jump is legal
-                    return false;
-                }
-            }
-            start=finish;
-            if (current->getColor()==DARK){
-                if (board->isLegalJump(piece, start, finish)) return false;
-            }
-
-            return true;
-        }
-    }
-    return false; //wrong color piece
+    return false;
 }
 
 //checks if user wants to play again
@@ -186,9 +181,9 @@ void Controller::executeMove(Move m) {
             finish=m.getNext();
             board->removePiece({(finish[0]+start[0])/2,(finish[1]+start[1])/2}); //remove the jumped piece
             board->movePiece(start,finish);
-            if ((current == light && current->isHuman()) || (current==dark && !current->isHuman())) ui.updateBoard(false, true); //update board (no footer and flipped).
+     /*       if ((current == light && current->isHuman()) || (current==dark && !current->isHuman())) ui.updateBoard(false, true); //update board (no footer and flipped).
             else ui.updateBoard(false); //update board (no footer).
-            pause(1000); //wait 1 second before going to next jump (animates move sequence).
+            pause(1000); //wait 1 second before going to next jump (animates move sequence).*/
         }
     }
 }

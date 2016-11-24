@@ -2,8 +2,11 @@
 #define CHECKERS_BOARD_H
 
 #include "Piece.h"
+#include "Move.h"
 #include <string>
 #include <array>
+#include <vector>
+#include <unordered_set>
 
 using namespace std;
 
@@ -31,11 +34,16 @@ public:
     void removePiece(array<int, 2> a);
     void movePiece(array<int,2> start, array<int,2> finish);
     bool withinBounds(array<int, 2> array);
+    void getMultiJumps(Piece * p, vector<array<int,2>> seed, vector<Move> &all_moves);
+    vector<Move> getMoves(Color color);
 
 private:
     array<array<Piece*,8>, 8> board; //represents the board and stores the pointers to Pieces
     int darkPieces, lightPieces; //stores the current number of light and dark pieces on the board.
 
+    void printMoves(vector<Move> all_moves);
+    bool notRepeat(vector<array<int,2>> &sequence, array<int,2> &finish);
+    bool notBackTrack(vector<array<int,2>> &sequence, array<int,2> &finish);
 };
 
 

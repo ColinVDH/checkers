@@ -1,3 +1,4 @@
+
 #include "GameBoard.h"
 //constructor for game board -- dark pieces at the start of the array (bottom), light pieces at the back of the array (top)
 GameBoard::GameBoard() {
@@ -24,21 +25,25 @@ GameBoard::GameBoard(array<array<Piece *, 8>, 8> b, int darkP, int lightP) {
 }
 
 Piece * GameBoard::getPiece(int x, int y) {
+    if (!withinBounds({x,y}))return nullptr;
     return board[y][x];
 }
 
 void GameBoard::setPiece(int x, int y, Piece *p) {
+    if (!withinBounds({x,y})) return;
     if (board[y][x]!=nullptr) delete board[y][x];
     board[y][x]=p;
 }
 
 void GameBoard::setPiece(array<int, 2> a, Piece* p) {
+    if (!withinBounds(a)) return;
     if (board[a[1]][a[0]]!=nullptr) delete board[a[1]][a[0]];
     board[a[1]][a[0]]=p;
 }
 
 
 Piece * GameBoard::getPiece(array<int, 2> a) {
+    if (!withinBounds(a)) return nullptr;
     return board[a[1]][a[0]];
 }
 
@@ -169,17 +174,12 @@ void GameBoard::removePiece(array<int, 2> a) {
 
 //GameBoard destructor will delete all objects from the board.
 GameBoard::~GameBoard() {
-    array<array<Piece*,8>,8>::const_iterator row;
-    array<Piece*,8>::const_iterator col;
-
-    for (row = board.begin(); row != board.end(); ++row)
-    {
-        for (col = row->begin(); col != row->end(); ++col)
-        {
-            delete (*col);
+    for (int i=0; i<8; i++){
+        for (int j=0; j<8; j++){
+            delete board[i][j];
         }
     }
-
+    board=array<array<Piece*,8>,8>();
 }
 //moves Piece from position start to position finish
 void GameBoard::movePiece(array<int, 2> start, array<int, 2> finish) {
@@ -239,6 +239,168 @@ GameBoard::GameBoard(GameBoard *obj) {
         }
     }
 }
+
+//gets all possible (legal) moves
+vector<Move> GameBoard::getMoves(Color color){
+    vector<Move> all_moves;
+    all_moves.clear();
+    Move currentmove;
+    vector<array<int,2>> sequence;
+    for (int y = 0; y<8; y++) { //iterate through board coordinates
+        for (int x = 0; x < 8; x++) {
+            Piece * piece =getPiece(x,y);
+            if (piece!=nullptr && piece->getColor()==color){ //if there is a piece at this position
+                if (piece->getType()==KING || piece->getColor()==LIGHT){ //checks if its the computer's color and the proper type to move down (light or king).
+                    sequence = {{x,y},{x-2,y-2}};
+                    if (isLegalJump(piece, sequence[0], sequence[1])) { //checks if jump is legal
+                        getMultiJumps(piece, sequence, all_moves); //call multijump to append further jumps if possible
+                    }
+                    sequence = {{x,y},{x+2,y-2}};
+                    if (isLegalJump(piece, sequence[0], sequence[1])) { //checks if jump is legal
+                        getMultiJumps(piece, sequence, all_moves); //call multijump to append further jumps if possible
+                    }
+                }
+                if (piece->getType()==KING || piece->getColor()==DARK){ //checks if its the computer's color and the proper type to move up (dark or king).
+                    sequence = {{x,y},{x-2,y+2}};
+                    if (isLegalJump(piece, sequence[0], sequence[1])) {  //checks if jump is legal
+                        getMultiJumps(piece, sequence, all_moves); //call multijump to append further jumps if possible
+                    }
+                    sequence = {{x,y},{x+2,y+2}};
+                    if (isLegalJump(piece, sequence[0], sequence[1])) { //checks if jump is legal
+                        getMultiJumps(piece, sequence, all_moves); //call multijump to append further jumps if possible
+                    }
+                }
+            }
+        }
+    }
+
+    if (all_moves.empty()){  //no jump moves available , then you can now look for a regular move
+        for (int y = 0; y<8; y++) { //iterate through board coordinates
+            for (int x = 0; x < 8; x++) {
+                Piece * piece =getPiece(x,y);
+                if (piece!=nullptr && piece->getColor()==color){
+                    if (piece->getType()==KING || piece->getColor()==LIGHT){ //checks if its the computer's color and the proper type to move down (light or king).
+                        sequence = {{x,y},{x-1,y-1}};
+                        if (isLegalSlide(piece, sequence[0], sequence[1])) { //checks if legal move
+                            currentmove=Move(sequence);
+                            all_moves.push_back(currentmove); //add move
+                        }
+                        sequence = {{x,y},{x+1,y-1}};
+                        if (isLegalSlide(piece, sequence[0], sequence[1])) { //checks if legal move
+                            currentmove=Move(sequence);
+                            all_moves.push_back(currentmove); //add move
+                        }
+                    }
+                    if (piece->getType()==KING || piece->getColor()==DARK){ //checks if its the computer's color and the proper type to move up (dark or king).
+                        sequence = {{x,y},{x-1,y+1}};
+                        if (isLegalSlide(piece, sequence[0], sequence[1])) { //checks if legal move
+                            currentmove=Move(sequence);
+                            all_moves.push_back(currentmove); //add move
+                        }
+                        sequence = {{x,y},{x+1,y+1}};
+                        if (isLegalSlide(piece, sequence[0], sequence[1])) { //checks if legal move
+                            currentmove=Move(sequence);
+                            all_moves.push_back(currentmove); //add move
+                        }
+                    }
+                }
+            }
+        }
+    }
+    printMoves(all_moves);
+    cout<<"SIZE"<<all_moves.size();
+    return all_moves; //return all possible legal moves
+}
+
+//recursive function that takes a current seed (part of a jump move) and looks if another jump can be added on. If not, it adds the complete jump sequence to "all_moves" vector.
+void GameBoard::getMultiJumps(Piece * p, vector<array<int,2>> seed, vector<Move> &all_moves){
+    cout<<"CALLED";
+    Color c=p->getColor();
+    Type t=p->getType();
+
+    array<int,2> start=seed.back(); //the start of the next jump is the last coordinate in the "seed"
+    array<int,2> finish1; //the finish is unassigned.
+    array<int,2> finish2; //the finish is unassigned.
+    Move currentmove;
+    vector<array<int,2>> newseed;
+
+    bool f1=false, f2=false, f3=false, f4=false;
+    if (t==KING || c==LIGHT){ //checks the type and the color of the piece (computer piece) performing the jump
+        finish1={start[0]-2, start[1]-2};
+        finish2={start[0]+2, start[1]-2};
+
+        if (isLegalJump(p,start,finish1) && notBackTrack(seed, finish1) && notRepeat(seed, finish1)){
+            cout<<"oneok"<<endl;
+            newseed=seed;
+            newseed.push_back(finish1);
+            getMultiJumps(p,newseed, all_moves); //recursively call function with updated seed.
+            f1=true;
+        }
+        if (isLegalJump(p,start,finish2) && notBackTrack(seed, finish2) && notRepeat(seed, finish2)){
+            cout<<"twook"<<endl;
+            newseed=seed;
+            newseed.push_back(finish2);
+            getMultiJumps(p, newseed, all_moves); //recursively call function with updated seed.
+            f2=true;
+        }
+        if (t!=KING && !f1 && !f2 ){
+            currentmove=Move(seed);
+            all_moves.push_back(currentmove); //add move
+        }
+    }
+
+    if (t==KING || c==DARK){ //checks the type and the color of the piece (computer piece) performing the jump. Same as above but for a dark piece.
+        finish1={start[0]-2, start[1]+2};
+        finish2={start[0]+2, start[1]+2};
+        if (isLegalJump(p,start,finish1) && notBackTrack(seed, finish1) && notRepeat(seed, finish1)){
+            cout<<"threeok"<<endl;
+            newseed = seed;
+            newseed.push_back(finish1);
+            getMultiJumps(p, newseed, all_moves); //recursively call function with updated seed.
+            f3=true;
+        }
+        if (isLegalJump(p,start,finish2) && notBackTrack(seed, finish2) && notRepeat(seed, finish2)){
+            cout<<"fourok"<<endl;
+            newseed = seed;
+            newseed.push_back(finish2);
+            getMultiJumps(p, newseed, all_moves); //recursively call function with updated seed.
+            f4=true;
+        }
+        if (t!=KING && !f3 && !f4){
+            currentmove=Move(seed);
+            all_moves.push_back(currentmove); //add move
+        }
+    }
+    if (t==KING && !f1 && !f2 && !f3 && !f4){
+        currentmove=Move(seed);
+        all_moves.push_back(currentmove); //add move
+    }
+}
+
+void GameBoard::printMoves(vector<Move> all_moves) {
+    for (Move m: all_moves){
+        for (array<int,2> coord: m.getSequence()){
+            cout<<coord[0]<<","<<coord[1]<<"\t";
+        }
+        cout<<"\n";
+    }
+}
+
+bool GameBoard::notRepeat(vector<array<int, 2>> &sequence, array<int, 2> &finish) {
+    array<int,2> start=sequence.back();
+    for (int i=1; i<sequence.size()-1; i++){
+        if (sequence[i]==start && (sequence[i-1]==finish || sequence[i+1]==finish)) return false;
+    }
+    return true;
+}
+
+bool GameBoard::notBackTrack(vector<array<int, 2>> &sequence, array<int, 2> &finish) {
+    return finish!=sequence.end()[-2];
+}
+
+
+
+
 
 
 
