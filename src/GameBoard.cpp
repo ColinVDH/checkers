@@ -307,14 +307,13 @@ vector<Move> GameBoard::getMoves(Color color){
             }
         }
     }
-    printMoves(all_moves);
-    cout<<"SIZE"<<all_moves.size();
+   // printMoves(all_moves);
+   // cout<<"SIZE"<<all_moves.size();
     return all_moves; //return all possible legal moves
 }
 
 //recursive function that takes a current seed (part of a jump move) and looks if another jump can be added on. If not, it adds the complete jump sequence to "all_moves" vector.
 void GameBoard::getMultiJumps(Piece * p, vector<array<int,2>> seed, vector<Move> &all_moves){
-    cout<<"CALLED";
     Color c=p->getColor();
     Type t=p->getType();
 
@@ -330,14 +329,12 @@ void GameBoard::getMultiJumps(Piece * p, vector<array<int,2>> seed, vector<Move>
         finish2={start[0]+2, start[1]-2};
 
         if (isLegalJump(p,start,finish1) && notBackTrack(seed, finish1) && notRepeat(seed, finish1)){
-            cout<<"oneok"<<endl;
             newseed=seed;
             newseed.push_back(finish1);
             getMultiJumps(p,newseed, all_moves); //recursively call function with updated seed.
             f1=true;
         }
         if (isLegalJump(p,start,finish2) && notBackTrack(seed, finish2) && notRepeat(seed, finish2)){
-            cout<<"twook"<<endl;
             newseed=seed;
             newseed.push_back(finish2);
             getMultiJumps(p, newseed, all_moves); //recursively call function with updated seed.
@@ -353,14 +350,12 @@ void GameBoard::getMultiJumps(Piece * p, vector<array<int,2>> seed, vector<Move>
         finish1={start[0]-2, start[1]+2};
         finish2={start[0]+2, start[1]+2};
         if (isLegalJump(p,start,finish1) && notBackTrack(seed, finish1) && notRepeat(seed, finish1)){
-            cout<<"threeok"<<endl;
             newseed = seed;
             newseed.push_back(finish1);
             getMultiJumps(p, newseed, all_moves); //recursively call function with updated seed.
             f3=true;
         }
         if (isLegalJump(p,start,finish2) && notBackTrack(seed, finish2) && notRepeat(seed, finish2)){
-            cout<<"fourok"<<endl;
             newseed = seed;
             newseed.push_back(finish2);
             getMultiJumps(p, newseed, all_moves); //recursively call function with updated seed.

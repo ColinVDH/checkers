@@ -27,7 +27,7 @@ bool HumanPlayer::hasValidInput(){
     if (split_input.size()<2) return false;
     for (auto const& item : split_input) {
         if (!((item.length()==2)
-              && 0<=(item[0]-'a') && (item[0]-'a')<=7
+              && 0<=(tolower(item[0])-'a') && (tolower(item[0])-'a')<=7
               && 0<=(item[1]-'1') && (item[1]-'1')<=7)){ //checks if the first part of each word is a letter from a to h and the second part is a number from 1 to 8
             return false;
         }
@@ -41,7 +41,7 @@ Move HumanPlayer::getMove() {
     else{
         vector<string> split_input = split(input,' '); //split input by whitespace into a vector of strings.
         for (auto const& item : split_input){
-            int x=item[0]-'a'; //convert the labels to actual x coordinates
+            int x=tolower(item[0])-'a'; //convert the labels to actual x coordinates
             int y=item[1]-'1'; //convert the label to actual y coordinate
             sequence.push_back({x,y}); //add to the move sequence
         }

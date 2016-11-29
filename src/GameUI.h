@@ -16,7 +16,7 @@ class GameUI {
 
 public:
     GameUI();
-    void initUI(GameBoard *b, Player * p);
+    void initUI(GameBoard *b, Player * p, GameMode gm);
     void mainMenu();
     void clearScreen();
     void InvalidInputMessage();
@@ -28,9 +28,13 @@ public:
 
     void updateBoard(bool footer, bool flipped);
 
+    void incrementTurn();
+
 private:
     GameBoard * board; //pointer to game board
     Player * current; //pointer to current player
+    GameMode gm;
+    int turn_number=1;
 
     void showFooter();
     void showBoard(bool flipped);

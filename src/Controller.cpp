@@ -48,7 +48,7 @@ void Controller::start(){
             }
         }
         current=dark; //dark always starts
-        ui.initUI(board, current); //provides UI with the board and the current player.
+        ui.initUI(board, current, gm); //provides UI with the board and the current player.
 
 
         while (!checkLose()){ //game Loop runs until somebody loses.
@@ -80,6 +80,7 @@ void Controller::start(){
                 else {
                     legalmove=true;
                     executeMove(move); //execute the move
+                    ui.incrementTurn();
                 }
             }
             current==dark ? current=light:current=dark; //switch the current player
@@ -97,9 +98,9 @@ void Controller::start(){
 //gets the user input and returns the game mode.
 GameMode Controller::getGameMode() {
     string i = getInput();
-    if (i=="q") exit(0);
-    else if (i=="1") return TWOPLAYER;
-    else if (i=="2") return PLAYERCOMPUTER;
+    if (i=="q" or i=="4") exit(0);
+    else if (i=="1") return PLAYERCOMPUTER;
+    else if (i=="2") return TWOPLAYER;
     else if (i=="3") return TWOCOMPUTER;
     else{
         showError(INVALID,1000); //show invalid error message for 1 second

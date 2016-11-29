@@ -9,7 +9,12 @@ GameUI::GameUI() {
 
 //shows the footer on the game screen
 void GameUI::showFooter() {
-    if (current->isHuman()) cout<<"Enter move:";
+    if (current->isHuman()){
+        cout<<"Enter a sequence of coordinates to move a piece\n"
+            "  e.g., 'F1 D4 B1' would be a double jump\n";
+        cout<< current->getColor() << " Player Move:";
+    }
+    else cout<< "Computer "<<"("<<current->getColor()<<") Turn...";
 }
 
 //shows the board. If flipped, the board will be rotated 180 degrees and displayed.
@@ -38,9 +43,9 @@ void GameUI::showBoard(bool flipped) {
             result+=to_string(i+1)+"\n"; //add the row number and a newline.
         }
         cout<<endl;
-        cout<<" h  g  f  e  d  c  b  a "<<endl; //print column labels above
+        cout<<"  H  G  F  E  D  C  B  A "<<endl; //print column labels above
         cout<<result; //board string
-        cout<<" h  g  f  e  d  c  b  a "<<endl; //print column labels below
+        cout<<"  H  G  F  E  D  C  B  A "<<endl; //print column labels below
         cout<<endl;
     }
     else{
@@ -59,18 +64,19 @@ void GameUI::showBoard(bool flipped) {
             result+=to_string(i+1)+"\n"; //add the row number and a newline
         }
         cout<<endl;
-        cout<<" a  b  c  d  e  f  g  h "<<endl;//print column labels above
+        cout<<"  A  B  C  D  E  F  G  H "<<endl;//print column labels above
         cout<<result; //board string
-        cout<<" a  b  c  d  e  f  g  h "<<endl; //print column labels below
+        cout<<"  A  B  C  D  E  F  G  H "<<endl; //print column labels below
         cout<<endl;
     }
 }
 
 //display header
 void GameUI::showHeader() {
-    if (current->isHuman()) cout<< current->getColor() << " player";
-    else cout<< "Computer "<<"("<<current->getColor()<<")";
-    cout<<" turn."<<endl;
+    if (gm==TWOPLAYER) cout<<"CHECKERS: Two-Player Mode        Turn: ";
+    else if (gm==PLAYERCOMPUTER) cout<<"CHECKERS: One-Player Mode        Turn: ";
+    else if (gm==TWOCOMPUTER) cout<<"CHECKERS: Demo Mode        Turn: ";
+    cout<<turn_number<<endl;
 }
 
 //update board, with options to show the footer and to show the board flipped.
@@ -100,19 +106,22 @@ void GameUI::mainMenu() {
             " ╚═════╝╚═╝  ╚═╝╚══════╝ ╚═════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝╚══════╝\n"
             "                                                                \n"
             ""<<endl;
-    cout<<"1. Player vs. Player"<<endl;
-    cout<<"2. Player vs. Computer"<<endl;
-    cout<<"3. Computer vs. Computer"<<endl<<endl;
-    cout<<"Select:";
+
+    cout<<"Main Menu Options:\n"
+            "  1. Play Checkers with a computer opponent\n"
+            "  2. Play Checkers with another person\n"
+            "  3. Game Demo \n"
+            "  4. Quit\n";
+    cout<<"Enter a number to choose:";
 }
 
 //print invalid input message
 void GameUI::InvalidInputMessage() {
-    cout<<"ERROR: Invalid Input!"<<endl;
+    cerr<<"ERROR: Invalid input provided"<<endl;
 }
 //print illegal move message
 void GameUI::IllegalMoveMessage() {
-    cout<<"ERROR: Illegal Move!"<<endl;
+    cerr<<"ERROR: Illegal move attempted"<<endl;
 }
 //print game over screen
 void GameUI::endGame(GameMode gm, Player * winner) {
@@ -130,13 +139,15 @@ void GameUI::endGame(GameMode gm, Player * winner) {
     if (gm==PLAYERCOMPUTER && !winner->isHuman()) cout<<"Computer wins!"<<endl;
     else if (gm==PLAYERCOMPUTER && winner->isHuman()) cout<<"You win!"<<endl;
     else cout<<winner->getColor()<<" wins!"<<endl;
-    cout<<"Play again? (y/n) ";
+    cout<<"Would you like to play again? (y or n) ";
 }
 
 //updates UI with the board and current player pointers.
-void GameUI::initUI(GameBoard *b, Player *p) {
+void GameUI::initUI(GameBoard *b, Player *p, GameMode g) {
     board=b;
     current=p;
+    gm=g;
+    turn_number=1;
 }
 
 //clears the screen
@@ -147,6 +158,10 @@ void GameUI::clearScreen(){
 //updates the current player pointer
 void GameUI::updatePlayer(Player *p) {
     current=p;
+}
+
+void GameUI::incrementTurn() {
+    turn_number++;
 }
 
 
